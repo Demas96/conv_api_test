@@ -48,7 +48,7 @@ async def add_audio(file, user_id, token, request):
         shutil.copyfileobj(file.file, wf)
         file.file.close()
     query = audio_table.insert().values(
-        name=f'{file.filename[:-4]}.mp3',
+        name=f'{os.path.splitext(file.filename)[0]}',
         path=f"{os.path.join(os.getcwd(), 'app', 'static', 'mp3')}",
         user_id=db_user.id
     ).returning(audio_table.c.token, audio_table.c.user_id)

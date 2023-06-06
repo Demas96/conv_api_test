@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  fastapi:
+    container_name: conv_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    command: [ "./cmd.sh" ]
+    ports:
+      - "8000:8000"
+    depends_on:
+      pgdb:
+        condition: service_healthy
+    volumes:
+      - .:/Fastapi_app
+
+  pgdb:
+    image: postgres:15.3
+    restart: always
+    environment:
+      - POSTGRES_DB=$NAME_DB
+      - POSTGRES_USER=$USER_DB
+      - POSTGRES_PASSWORD=$PASSWORD_DB
+    container_name: pgdb
+    volumes:
+      - ./app/database:/var/lib/postgresql/data/
+    ports:
+      - "${PORT_DB}:${PORT_DB}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdbdata: null
